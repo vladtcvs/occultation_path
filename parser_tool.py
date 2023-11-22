@@ -238,7 +238,7 @@ def process_file_geojson(input_fname, output_fname):
                                             properties=props))
 
         collection = geojson.FeatureCollection(features=features)
-        geojson.dump(collection, f)
+        geojson.dump(collection, f, indent=4)
 
 if __name__ == "__main__":
     process_file_geojson(sys.argv[1], sys.argv[2])
