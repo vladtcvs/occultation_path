@@ -164,6 +164,9 @@ def process_file_geojson(input_fname, output_fname):
     with open(output_fname, "w", encoding="utf8") as f:
         features = []
 
+        center_line_points = []
+        path_limit1_line_points = []
+        path_limit2_line_points = []
         for fields in points:
             props = {
                 "UT": fields["UT"],
@@ -177,17 +180,30 @@ def process_file_geojson(input_fname, output_fname):
             lat = fields["center_lat"]
             features.append(geojson.Feature(geometry=geojson.Point((lon, lat)),
                                             properties=props))
+            center_line_points.append((lon, lat))
             if "path_limit1_lon" in fields:
                 lon = fields["path_limit1_lon"]
             lat = fields["path_limit1_lat"]
             features.append(geojson.Feature(geometry=geojson.Point((lon, lat)),
                                             properties=props))
+            path_limit1_line_points.append((lon, lat))
             if "path_limit2_lon" in fields:
                 lon = fields["path_limit2_lon"]
             lat = fields["path_limit2_lat"]
             features.append(geojson.Feature(geometry=geojson.Point((lon, lat)),
                                             properties=props))
+            path_limit2_line_points.append((lon, lat))
 
+        center_line = geojson.LineString(coordinates=center_line_points)
+        path_limit1_line = geojson.LineString(coordinates=path_limit1_line_points)
+        path_limit2_line = geojson.LineString(coordinates=path_limit2_line_points)
+        props = {
+            "star" : event["star"],
+            "planet" : event["planet"],
+        }
+        features.append(geojson.Feature(geometry=center_line, properties=props))
+        features.append(geojson.Feature(geometry=path_limit1_line, properties=props))
+        features.append(geojson.Feature(geometry=path_limit2_line, properties=props))
         collection = geojson.FeatureCollection(features=features)
         geojson.dump(collection, f, indent=4)
 
